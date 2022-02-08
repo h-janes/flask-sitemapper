@@ -17,7 +17,7 @@ The sitemapper must be initialised with the app instance as shown below.
 
 Flask Sitemapper requires `SERVER_NAME` to be specified in the Flask configuration.
 
-Additionally, the `PREFERRED_URL_SCHEME` configuration variable will be used to determine whether the sitemap uses HTTP or HTTPS for URLs. If this is not set, HTTPS will be used.
+Additionally, the `PREFERRED_URL_SCHEME` configuration variable will be used to determine whether the sitemap uses HTTP or HTTPS for URLs. If this is not set, HTTP will be used.
 ```python
 import flask
 from flask_sitemapper import Sitemapper
@@ -25,7 +25,7 @@ from flask_sitemapper import Sitemapper
 app = flask.Flask("test_app")
 
 app.config["SERVER_NAME"] = "127.0.0.1:5000"
-app.config["PREFERRED_URL_SCHEME"] = "http"
+app.config["PREFERRED_URL_SCHEME"] = "https"
 
 sitemapper = Sitemapper(app)
 ```
@@ -57,7 +57,7 @@ def r_about():
 This example would appear in the sitemap as:
 ```xml
 <url>
-  <loc>http://127.0.0.1:5000/about</loc>
+  <loc>https://127.0.0.1:5000/about</loc>
   <lastmod>2022-02-08</lastmod>
   <changefreq>monthly</changefreq>
   <priority>1.0</priority>
@@ -89,16 +89,16 @@ The sitemap generated using these examples would look like this:
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"...>
   <url>
-    <loc>http://127.0.0.1:5000/</loc>
+    <loc>https://127.0.0.1:5000/</loc>
   </url>
   <url>
-    <loc>http://127.0.0.1:5000/about</loc>
+    <loc>https://127.0.0.1:5000/about</loc>
     <lastmod>2022-02-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:5000/store</loc>
+    <loc>https://127.0.0.1:5000/store</loc>
   </url>
 </urlset>
 ```

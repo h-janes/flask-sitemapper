@@ -5,7 +5,7 @@ from flask_sitemapper import Sitemapper
 # Create the test app
 app = flask.Flask("test_app")
 app.config["SERVER_NAME"] = "127.0.0.1:5000"  # SERVER_NAME is required
-app.config["PREFERRED_URL_SCHEME"] = "http"
+app.config["PREFERRED_URL_SCHEME"] = "https"
 
 # Initialise sitemapper
 sitemapper = Sitemapper(app)
