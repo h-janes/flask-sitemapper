@@ -30,7 +30,7 @@ class Sitemapper:
                     "loc": url_for(
                         func.__name__,
                         _external=True,
-                        _scheme=self.app.config.get("PREFFERED_URL_SCHEME", "http"),
+                        _scheme=self.app.config.get("PREFERRED_URL_SCHEME", "http"),
                     )
                 }
 
