@@ -26,7 +26,7 @@ class Sitemapper:
 
         def decorator(func: Callable) -> Callable:
             with self.app.app_context():
-                url = {"loc": url_for(func.__name__, _external=True)}
+                url = {"loc": url_for(func.__name__, _external=True, _scheme="https")}
 
             url.update(kwargs)
             self.urlset.append(url)

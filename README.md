@@ -16,8 +16,6 @@ pip install flask-sitemapper
 The sitemapper must be initialised with the app instance as shown below.
 
 Flask Sitemapper requires `SERVER_NAME` to be specified in the Flask configuration.
-
-Additionally, the `PREFERRED_URL_SCHEME` configuration variable will be used to determine whether the sitemap uses HTTP or HTTPS for URLs. If this is not set, HTTP will be used.
 ```python
 import flask
 from flask_sitemapper import Sitemapper
@@ -25,7 +23,6 @@ from flask_sitemapper import Sitemapper
 app = flask.Flask("test_app")
 
 app.config["SERVER_NAME"] = "127.0.0.1:5000"
-app.config["PREFERRED_URL_SCHEME"] = "https"
 
 sitemapper = Sitemapper(app)
 ```
