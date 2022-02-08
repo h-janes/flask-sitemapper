@@ -1,6 +1,6 @@
 # Necessary imports
 import flask
-from flask_sitemapper import Sitemapper
+from sitemapper import Sitemapper
 
 # Create the test app
 app = flask.Flask("test_app")

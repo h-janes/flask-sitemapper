@@ -17,9 +17,10 @@ SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
 
 
 class Sitemapper:
-    def __init__(self, app: Flask) -> None:
+    def __init__(self, app: Flask, https: bool = True) -> None:
         self.app = app
         self.urlset = []
+        self.scheme = "https" if https else "http"
 
     def include(self, **kwargs) -> Callable:
         """A decorator for route functions to add them to the sitemap"""
@@ -27,7 +28,7 @@ class Sitemapper:
         def decorator(func: Callable) -> Callable:
             with self.app.app_context():
                 url = {
-                    "loc": f"https://{self.app.config.get('SERVER_NAME')}{url_for(func.__name__)}"
+                    "loc": url_for(func.__name__, _external=True, _scheme=self.scheme)
                 }
 
             url.update(kwargs)
