@@ -2,6 +2,8 @@
 
 Flask Sitemapper is a small Python 3 package that generates XML sitemaps for Flask applications. This allows you to create a nice and fully functional sitemap for your project with very minimal code, as demonstrated below. It is compatible with Flask blueprints.
 
+PyPi: https://pypi.org/project/flask-sitemapper/
+
 ## Requirements
 * Python3
 * Flask
