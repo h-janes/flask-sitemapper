@@ -74,12 +74,14 @@ def r_store():
     return "<h1>Store Page</h1>"
 ```
 
-### Serving the sitemap
-The sitemap will be served at `/sitemap.xml` by default.
+### Generating and serving the sitemap
+To serve your sitemap, you must define a route function that returns `sitemapper.generate()`. Your sitemap will then be avaliable at the URL(s) you specify.
 
-You can change this path by passing the keyword argument `url_path` to your instance when initialsing Flask Sitemapper. You must include a leading slash.
+This route should be defined after all routes that are included in the sitemap.
 ```python
-sitemapper = Sitemapper(app, url_path="/alt_path.xml")
+@app.route("/sitemap.xml")
+def r_sitemap():
+    return sitemapper.generate()
 ```
 
 The sitemap generated using these examples would look like this:
