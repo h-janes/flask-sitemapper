@@ -15,11 +15,30 @@ SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
   {% endfor %}
 </urlset>"""
 
+# Sitemap counter for unique endpoint names
+NUMBER_OF_SITEMAPS = 0
+
 
 class Sitemapper:
-    def __init__(self, app: Flask) -> None:
-        self.app = app  # Store the flask app instance
-        self.urlset = []  # A list to store urls for the sitemap
+    def __init__(self, app: Flask, url_path: str = "/sitemap.xml") -> None:
+        self.url_path = url_path
+        self.app = app
+        self.urlset = []
+
+        # Disgusting code to allow for mulitple sitemaps
+        def create_sitemap_route() -> Callable:
+            def sitemap_route() -> Response:
+                template = Environment(loader=BaseLoader).from_string(SITEMAP)
+                xml = template.render(urlset=self.urlset)
+                return Response(xml, mimetype="text/xml")
+
+            global NUMBER_OF_SITEMAPS
+            sitemap_route.__name__ = f"sitemap_route_{NUMBER_OF_SITEMAPS}"
+            NUMBER_OF_SITEMAPS += 1
+            return sitemap_route
+
+        # Add sitemap route to the app
+        self.app.add_url_rule(self.url_path, view_func=create_sitemap_route())
 
     def include(self, **kwargs) -> Callable:
         """A decorator for route functions to add them to the sitemap"""
@@ -45,9 +64,3 @@ class Sitemapper:
             return wrapper
 
         return decorator
-
-    def generate(self):
-        """Creates the response for the sitemap route"""
-        template = Environment(loader=BaseLoader).from_string(SITEMAP)
-        xml = template.render(urlset=self.urlset)
-        return Response(xml, mimetype="text/xml")

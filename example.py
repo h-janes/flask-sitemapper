@@ -39,11 +39,14 @@ def r_admin():
     return "<h1>Admin Page</h1>"
 
 
-# Define the route for the sitemap
-# This should be done after defining all routes that will appear in the sitemap
-@app.route("/sitemap.xml")
-def r_sitemap():
-    return sitemapper.generate()
+# Creating a second sitemap
+sitemapper2 = Sitemapper(app, url_path="/sitemap_2.xml")
+
+# Adding a route to the second sitemap
+@sitemapper2.include()
+@app.route("/something")
+def r_something():
+    return "<h1>Something...</h1>"
 
 
 # Run the test app
