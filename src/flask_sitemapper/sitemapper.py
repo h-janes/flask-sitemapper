@@ -3,36 +3,43 @@ from functools import wraps
 from jinja2 import Environment, BaseLoader
 from flask import Flask, url_for, Response
 
-# Jinja template for the sitemap
+# Jinja template for sitemaps
 SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  {% for url in urlset %}
-    <url>
-      {% for arg, value in url.items() %}
-        <{{arg}}>{{ value }}</{{arg}}>
-      {% endfor %}
-    </url>
-  {% endfor %}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  {%- for url in urlset %}
+  <url>
+    {%- for arg, value in url.items() %}
+    <{{arg}}>{{ value }}</{{arg}}>
+    {%- endfor %}
+  </url>
+  {%- endfor %}
 </urlset>"""
+
+# Jinja template for the sitemap index
+SITEMAP_INDEX = """<?xml version="1.0" encoding="utf-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  {%- for url in urlset %}
+  <sitemap>
+    {%- for arg, value in url.items() %}
+    <{{arg}}>{{ value }}</{{arg}}>
+    {%- endfor %}
+  </sitemap>
+  {%- endfor %}
+</sitemapindex>"""
 
 
 class Sitemapper:
-    def __init__(self, app: Flask, https: bool = True) -> None:
+    def __init__(self, app: Flask, https: bool = True, master: bool = False) -> None:
         self.app = app
         self.urlset = []
         self.scheme = "https" if https else "http"
+        self.template = SITEMAP_INDEX if master else SITEMAP
 
     def include(self, **kwargs) -> Callable:
-        """A decorator for route functions to add them to the sitemap"""
+        """A decorator for route functions that calls `add_endpoint`"""
 
         def decorator(func: Callable) -> Callable:
-            with self.app.app_context():
-                url = {
-                    "loc": url_for(func.__name__, _external=True, _scheme=self.scheme)
-                }
-
-            url.update(kwargs)
-            self.urlset.append(url)
+            self.add_endpoint(func.__name__, **kwargs)
 
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -43,8 +50,16 @@ class Sitemapper:
 
         return decorator
 
+    def add_endpoint(self, endpoint: str, **kwargs) -> None:
+        """Adds an endpoint to the sitemap"""
+        with self.app.app_context():
+            url = {"loc": url_for(endpoint, _external=True, _scheme=self.scheme)}
+
+        url.update(kwargs)
+        self.urlset.append(url)
+
     def generate(self) -> Response:
         """Creates a response for the sitemap route function"""
-        template = Environment(loader=BaseLoader).from_string(SITEMAP)
+        template = Environment(loader=BaseLoader).from_string(self.template)
         xml = template.render(urlset=self.urlset)
         return Response(xml, mimetype="text/xml")

@@ -24,7 +24,8 @@ from flask_sitemapper import Sitemapper
 
 app = flask.Flask("test_app")
 
-app.config["SERVER_NAME"] = "127.0.0.1:5000"
+# For development, use "127.0.0.1:5000"
+app.config["SERVER_NAME"] = "example.com"
 
 sitemapper = Sitemapper(app)
 ```
@@ -56,7 +57,7 @@ def r_about():
 This example would appear in the sitemap as:
 ```xml
 <url>
-  <loc>https://127.0.0.1:5000/about</loc>
+  <loc>https://example.com/about</loc>
   <lastmod>2022-02-08</lastmod>
   <changefreq>monthly</changefreq>
   <priority>1.0</priority>
@@ -73,6 +74,11 @@ def r_store():
     return "<h1>Store Page</h1>"
 ```
 
+You can also add Flask endpoints to the sitemap without using their route function. This may be useful when dealing with large or complex projects. Keyword arguments can still be given after the endpoint name.
+```python
+sitemapper.add_endpoint("r_contact", lastmod="2022-02-09")
+```
+
 ### Generating and serving the sitemap
 To serve your sitemap, you must define a route function that returns `sitemapper.generate()`. Your sitemap will then be avaliable at the URL(s) you specify.
 
@@ -83,21 +89,40 @@ def r_sitemap():
     return sitemapper.generate()
 ```
 
-The sitemap generated using these examples would look like this:
+### Master Sitemaps
+Master sitemaps, or sitemap indexes, are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organisational purposes. You can create a master sitemapper by specifying `master=True` when initialising your sitemapper.
+
+Note that sitemap indexes have a different syntax to regular sitemaps, so it is important to provide this argument.
+```python
+master_sitemapper = Sitemapper(app, master=True)
+```
+
+You can then decorate your sitemap route functions to add them to the sitemap index.
+```python
+@master_sitemapper.include()
+@app.route("/some_sitemap.xml")
+def r_some_sitemap():
+    return some_sitemapper.generate()
+```
+
+Or add them with `add_endpoint`
+```python
+@master_sitemapper.add_endpoint("r_some_sitemap")
+```
+
+Then create the route for the sitemap index.
+```python
+@app.route("/sitemap.xml")
+def r_sitemap_index():
+    return master_sitemapper.generate()
+```
+
+For this example, the sitemap index would look like this:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"...>
-  <url>
-    <loc>https://127.0.0.1:5000/</loc>
-  </url>
-  <url>
-    <loc>https://127.0.0.1:5000/about</loc>
-    <lastmod>2022-02-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://127.0.0.1:5000/store</loc>
-  </url>
-</urlset>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://example.com/some_sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>
 ```

@@ -38,10 +38,32 @@ def r_admin():
     return "<h1>Admin Page</h1>"
 
 
+# This route will be added with add_endpoint
+@app.route("/contact")
+def r_contact():
+    return "<h1>Contact Page</h1>"
+
+
+# Add the contact route with the add_endpoint method
+sitemapper.add_endpoint("r_contact", lastmod="2022-02-09")
+
+
 # Create the route for the sitemap
 @app.route("/sitemap.xml")
 def r_sitemap():
     return sitemapper.generate()
+
+
+# Create a master sitemap
+# In this example, we only add one sitemap
+# This is not a practical use of a sitemap index
+master_sitemapper = Sitemapper(app, master=True)
+master_sitemapper.add_endpoint("r_sitemap")
+
+# Create the route for the master sitemap
+@app.route("/sitemap_index.xml")
+def r_sitemap_index():
+    return master_sitemapper.generate()
 
 
 # Run the test app
