@@ -2,30 +2,7 @@ from typing import Callable
 from functools import wraps
 from jinja2 import Environment, BaseLoader
 from flask import Flask, url_for, Response
-
-# Jinja template for sitemaps
-SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {%- for url in urlset %}
-  <url>
-    {%- for arg, value in url.items() %}
-    <{{arg}}>{{ value }}</{{arg}}>
-    {%- endfor %}
-  </url>
-  {%- endfor %}
-</urlset>"""
-
-# Jinja template for the sitemap index
-SITEMAP_INDEX = """<?xml version="1.0" encoding="utf-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {%- for url in urlset %}
-  <sitemap>
-    {%- for arg, value in url.items() %}
-    <{{arg}}>{{ value }}</{{arg}}>
-    {%- endfor %}
-  </sitemap>
-  {%- endfor %}
-</sitemapindex>"""
+from templates import SITEMAP, SITEMAP_INDEX
 
 
 class Sitemapper:

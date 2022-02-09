@@ -30,7 +30,7 @@ app.config["SERVER_NAME"] = "example.com"
 sitemapper = Sitemapper(app)
 ```
 
-If you are using Flask blueprints, you can either list all URLs in a single sitemap by importing the sitemapper instance to your other files, or create multiple sitemaps for each blueprint by defining a sitemapper instance for each.
+If you are using Flask blueprints, you can either list all URLs in a single sitemap by importing the sitemapper instance to your other files or using the `add_endpoint` method (see below), or by creating a sitemap for each blueprint and using a sitemap index (see below).
 
 ### Adding URLs to the sitemap
 Decorators are added to route functions to include their URLs in the sitemap. These must be included above the Flask decorators.
