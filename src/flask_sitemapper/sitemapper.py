@@ -2,7 +2,7 @@ from typing import Callable
 from functools import wraps
 from jinja2 import Environment, BaseLoader
 from flask import Flask, url_for, Response
-from templates import SITEMAP, SITEMAP_INDEX
+from .templates import SITEMAP, SITEMAP_INDEX
 
 
 class Sitemapper:
