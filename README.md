@@ -1,5 +1,7 @@
 # Flask Sitemapper
-Flask Sitemapper is a small Python 3 package that generates XML sitemaps for Flask applications. This allows you to create a nice and fully functional sitemap for your project with very minimal code, as demonstrated below. It is compatible with Flask blueprints.
+Flask Sitemapper is a small Python 3 package that generates XML sitemaps for Flask applications. This allows you to create a fully functional sitemap for your project with minimal code, as demonstrated below. It is compatible with Flask blueprints.
+
+For more information about sitemaps and the XML schema, visit [sitemaps.org](https://www.sitemaps.org).
 
 ## Requirements
 * Python3
@@ -17,20 +19,40 @@ The sitemapper must be initialised with the app instance as shown below.
 
 Flask Sitemapper requires `SERVER_NAME` to be specified in the Flask configuration.
 
-By default, HTTPS will be used for all URLs in the sitemap. To change this, specify `https=False` when initialising the sitemapper.
+By default, HTTPS will be used for all URLs in the sitemap. To change this, specify `https=False` when creating the `Sitemapper` instance.
+
+#### Method 1 example (recommended)
 ```python
 import flask
 from flask_sitemapper import Sitemapper
 
+# create sitemapper instance
+sitemapper = Sitemapper()
+
+# create app
 app = flask.Flask("test_app")
 
 # For development, use "127.0.0.1:5000"
 app.config["SERVER_NAME"] = "example.com"
 
-sitemapper = Sitemapper(app)
+# initialize with app
+sitemapper.init_app(app)
 ```
 
-If you are using Flask blueprints, you can either list all URLs in a single sitemap by importing the sitemapper instance to your other files or using the `add_endpoint` method (see below), or by creating a sitemap for each blueprint and using a sitemap index (see below).
+#### Method 2 example
+```python
+import flask
+from flask_sitemapper import Sitemapper
+
+# create app
+app = flask.Flask("test_app")
+
+# For development, use "127.0.0.1:5000"
+app.config["SERVER_NAME"] = "example.com"
+
+# create instance and initialize with app
+sitemapper = Sitemapper(app)
+```
 
 ### Adding URLs to the sitemap
 Decorators are added to route functions to include their URLs in the sitemap. These must be included above the Flask decorators.
@@ -74,7 +96,14 @@ def r_store():
     return "<h1>Store Page</h1>"
 ```
 
-You can also add Flask endpoints to the sitemap without using their route function. This may be useful when dealing with large or complex projects. Keyword arguments can still be given after the endpoint name.
+### Using with Flask blueprints
+Create your `Sitemapper` instance(s) in a seperate file or otherwise avoiding circular imports.
+
+Import and use the instance(s) in your blueprints.
+
+Import the instance(s) when creating your flask app and initialize with `sitemapper.init_app(app)` ***after*** registering your blueprints.
+
+You can also add Flask endpoints to the sitemap by using their endpoint name as shown below. Keyword arguments can still be given after the endpoint name.
 ```python
 sitemapper.add_endpoint("r_contact", lastmod="2022-02-09")
 ```
@@ -89,7 +118,7 @@ def r_sitemap():
     return sitemapper.generate()
 ```
 
-### Master Sitemaps
+### Master sitemaps
 Master sitemaps, or sitemap indexes, are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organisational purposes. You can create a master sitemapper by specifying `master=True` when initialising your sitemapper.
 
 Note that sitemap indexes have a different syntax to regular sitemaps, so it is important to provide this argument.

@@ -6,7 +6,7 @@ clean:
 
 .PHONY: requirements
 requirements:
-	@pip install --upgrade flask jinja2 flask-sitemapper twine
+	@pip install --upgrade flask jinja2 build twine
 
 dist: clean
 	@python3 -m build
