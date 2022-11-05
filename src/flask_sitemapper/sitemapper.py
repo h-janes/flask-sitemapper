@@ -62,7 +62,7 @@ class Sitemapper:
             endpoint = view_func
 
         # add url of view_func and any kwargs to urlset
-        with self.app.app_context():
+        with self.app.test_request_context():
             url = {"loc": url_for(endpoint, _external=True, _scheme=self.scheme)}
 
         url.update(kwargs)
