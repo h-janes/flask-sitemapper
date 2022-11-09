@@ -89,11 +89,11 @@ def r_store():
 ```
 
 ### Using with Flask blueprints
-Create your `Sitemapper` instance(s) in a seperate file or otherwise avoiding circular imports.
+* Create your `Sitemapper` instance(s) in a seperate file or otherwise avoiding circular imports.
 
-Import and use the instance(s) in your blueprints.
+* Import and use the instance(s) in your blueprints.
 
-Import the instance(s) when creating your flask app and initialize with `sitemapper.init_app(app)` ***after*** registering your blueprints.
+* Import the instance(s) when creating your flask app and initialize with `sitemapper.init_app(app)` ***after*** registering your blueprints.
 
 You can also add Flask endpoints to the sitemap by using their endpoint name as shown below. Keyword arguments can still be given after the endpoint name.
 ```python
@@ -146,4 +146,36 @@ For this example, the sitemap index would look like this:
     <loc>https://example.com/some_sitemap.xml</loc>
   </sitemap>
 </sitemapindex>
+```
+
+### Example app
+```python
+import flask
+from flask_sitemapper import Sitemapper
+
+sitemapper = Sitemapper()
+
+app = flask.Flask("test_app")
+
+sitemapper.init_app(app)
+
+@sitemapper.include()
+@app.route("/")
+def r_home():
+    return flask.render_template("index.html")
+
+@sitemapper.include(
+    lastmod = "2022-02-08",
+    changefreq = "monthly",
+    priority = 1.0,
+)
+@app.route("/about")
+def r_about():
+    return flask.render_template("about.html")
+
+@app.route("/sitemap.xml")
+def r_sitemap():
+    return sitemapper.generate()
+
+app.run()
 ```

@@ -72,4 +72,4 @@ class Sitemapper:
         """Creates a flask `Response` object for the sitemap's view function"""
         template = Environment(loader=BaseLoader).from_string(self.template)
         xml = template.render(urlset=self.urlset)
-        return Response(xml, mimetype="text/xml")
+        return Response(xml, content_type="application/xml")
