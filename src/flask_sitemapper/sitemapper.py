@@ -1,7 +1,9 @@
-from typing import Callable, Union
 from functools import wraps
-from jinja2 import Environment, BaseLoader
-from flask import Flask, url_for, Response
+from typing import Callable, Union
+
+from flask import Flask, Response, url_for
+from jinja2 import BaseLoader, Environment
+
 from .templates import SITEMAP, SITEMAP_INDEX
 
 
@@ -47,13 +49,15 @@ class Sitemapper:
                 return endpoint
 
         # func not registered as view func
-        raise ValueError(f"function {func.__name__} in module {func.__module__} is not a registered view function")
+        raise ValueError(
+            f"function {func.__name__} in module {func.__module__} is not a registered view function")
 
     def add_endpoint(self, view_func: Union[Callable, str], **kwargs) -> None:
         """Adds the URL of `view_func` to the sitemap with any provided arguments"""
         # if flask app is not yet initialized, then register a deferred function and run it later in init_app()
         if not self.app:
-            self.deferred_functions.append(lambda s: s.add_endpoint(view_func, **kwargs))
+            self.deferred_functions.append(
+                lambda s: s.add_endpoint(view_func, **kwargs))
             return
 
         if not isinstance(view_func, str):
@@ -63,7 +67,8 @@ class Sitemapper:
 
         # add url of view_func and any kwargs to urlset
         with self.app.test_request_context():
-            url = {"loc": url_for(endpoint, _external=True, _scheme=self.scheme)}
+            url = {"loc": url_for(
+                endpoint, _external=True, _scheme=self.scheme)}
 
         url.update(kwargs)
         self.urlset.append(url)

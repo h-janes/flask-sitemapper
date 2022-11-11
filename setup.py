@@ -1,13 +1,14 @@
-from setuptools import setup, find_packages
 import pathlib
+
+from setuptools import find_packages, setup
+
+VERSION = "1.3.2"
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
-VERSION = "1.3.2"
-
 setup(
-    name="Flask Sitemapper",
+    name="flask-sitemapper",
     version=VERSION,
     license="MIT",
     # Metadata
