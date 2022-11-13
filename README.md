@@ -193,7 +193,6 @@ The following Python libraries will be installed automatically to a virtual envi
 * black
 * isort
 * pytest
-* requests
 
 ### Project Setup
 Install `poetry` if not already installed.
