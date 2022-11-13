@@ -1,5 +1,5 @@
 # Tests
-Test are currently being written. So far the tests are not ideal and the code strutcture is poor.
+Test are currently being written. So far the tests are not ideal and the code structure is poor.
 They will be improved when I get time to work on them more.
 
 For the time being, some manual testing is recommended in addition to using these tests.

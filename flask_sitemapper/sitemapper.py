@@ -1,3 +1,5 @@
+"""Provides the `Sitemapper` class"""
+
 from functools import wraps
 from typing import Callable, Union
 
@@ -21,7 +23,7 @@ class Sitemapper:
         # e.g. [{"loc": "https://example.com/about", "lastmod": "2022-05-22"}, ...]
         self.urlset = []
 
-        # list of functions to run after extension initilization
+        # list of functions to run after extension initialization
         self.deferred_functions = []
 
         # initialize the extension if the app argument is provided, otherwise, set self.app to None
@@ -34,7 +36,7 @@ class Sitemapper:
         # store the app instance for use elsewhere
         self.app = app
 
-        # run all defered functions
+        # run all deferred functions
         for deferred in self.deferred_functions:
             deferred(self)
 
@@ -42,7 +44,7 @@ class Sitemapper:
         self.deferred_functions.clear()
 
     def include(self, **kwargs) -> Callable:
-        """A decorator for view functions that adds their URL to the sitemap with any provided arguments"""
+        """A decorator for view functions to add their URL to the sitemap"""
 
         # decorator that calls add_endpoint
         def decorator(func: Callable) -> Callable:
@@ -66,7 +68,7 @@ class Sitemapper:
 
         # raise error if func is not registered as a view function
         raise ValueError(
-            f"function {func.__name__} in module {func.__module__} is not a registered view function"
+            f"{func.__name__} in module {func.__module__} is not a registered view function"
         )
 
     def add_endpoint(self, view_func: Union[Callable, str], **kwargs) -> None:
@@ -86,14 +88,14 @@ class Sitemapper:
         with self.app.test_request_context():
             url = {"loc": url_for(endpoint, _external=True, _scheme=self.scheme)}
 
-        # add any provided paramaters (e.g. lastmod) to the dict
+        # add any provided parameters (e.g. lastmod) to the dict
         url.update(kwargs)
 
         # append the dict to self.urlset
         self.urlset.append(url)
 
     def generate(self) -> Response:
-        """Creates a Flask `Response` object for the sitemap's view function"""
+        """Creates a Flask `Response` object for the XML sitemap"""
         # load the jinja template
         template = Environment(loader=BaseLoader).from_string(self.template)
 

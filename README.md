@@ -14,8 +14,8 @@ pip install flask-sitemapper
 ```
 
 ## Usage
-### Initialising Flask Sitemapper
-The sitemapper must be initialised with the app instance as shown below.
+### Initializing Flask Sitemapper
+The sitemapper must be initialized with the app instance as shown below.
 
 By default, HTTPS will be used for all URLs in the sitemap. To change this, specify `https=False` when creating the `Sitemapper` instance.
 
@@ -89,7 +89,7 @@ def r_store():
 ```
 
 ### Using With Flask blueprints
-* Create your `Sitemapper` instance(s) in a seperate file or otherwise avoiding circular imports.
+* Create your `Sitemapper` instance(s) in a separate file or otherwise avoiding circular imports.
 
 * Import and use the instance(s) in your blueprints.
 
@@ -101,7 +101,7 @@ sitemapper.add_endpoint("r_contact", lastmod="2022-02-09")
 ```
 
 ### Generating and Serving the Sitemap
-To serve your sitemap, you must define a route function that returns `sitemapper.generate()`. Your sitemap will then be avaliable at the URL(s) you specify.
+To serve your sitemap, you must define a route function that returns `sitemapper.generate()`. Your sitemap will then be available at the URL(s) you specify.
 
 This route should be defined after all routes that are included in the sitemap.
 ```python
@@ -111,7 +111,7 @@ def r_sitemap():
 ```
 
 ### Sitemap Indexes
-Sitemap indexes are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organisational purposes. You can create a master sitemapper, which generates a sitemap index, by specifying `master=True` when creating the instance.
+Sitemap indexes are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organizational purposes. You can create a master sitemapper, which generates a sitemap index, by specifying `master=True` when creating the instance.
 
 Note that sitemap indexes have a different syntax to regular sitemaps, so it is important to provide this argument.
 ```python

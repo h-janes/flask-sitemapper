@@ -1,3 +1,5 @@
+"""Provides the `gzip_response` function for compressing Flask `Response` objects"""
+
 from gzip import GzipFile
 from io import BytesIO
 
@@ -18,7 +20,7 @@ def gzip_response(response: Response) -> Response:
     ):
         return response
 
-    # avoid issues with direct_passtrough
+    # avoid issues with direct_passthrough
     response.direct_passthrough = False
 
     # gzip the response

@@ -1,4 +1,4 @@
-# jinja templates for the sitemap and sitemap index
+"""Provides Jinja2 templates for the sitemap and sitemap index"""
 
 SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
