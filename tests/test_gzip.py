@@ -2,7 +2,7 @@ import gzip
 
 import flask
 
-from flask_sitemapper.sitemapper import Sitemapper
+from flask_sitemapper import Sitemapper
 
 # ----------------- TEST APP -----------------
 

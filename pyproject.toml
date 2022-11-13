@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "flask-sitemapper"
 version = "1.4.0"
-description = "Flask extension to generate XML sitemaps"
+description = "Flask extension for generating XML sitemaps"
 authors = ["h-janes <dev@hjanes.com>"]
 license = "MIT"
 readme = "README.md"
@@ -10,10 +10,6 @@ classifiers=[
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Framework :: Flask",
     "Operating System :: OS Independent",
 ]
