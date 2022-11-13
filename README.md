@@ -5,12 +5,10 @@ Flask Sitemapper is a small Python 3 package that generates XML sitemaps for Fla
 
 For more information about sitemaps and the XML schema, visit [sitemaps.org](https://www.sitemaps.org).
 
-## Requirements
-* Python3
-* Flask
-* Jinja2
-
 ## Installation
+Flask Sitemapper requires Python 3.7 or newer. The Python packages `flask` and `jinja2` are also required, and will be installed automatically.
+
+The latest version can be installed from PyPi with pip as shown below.
 ```terminal
 pip install flask-sitemapper
 ```
@@ -21,7 +19,7 @@ The sitemapper must be initialised with the app instance as shown below.
 
 By default, HTTPS will be used for all URLs in the sitemap. To change this, specify `https=False` when creating the `Sitemapper` instance.
 
-#### Method 1 example (recommended)
+#### Recommended Method
 ```python
 import flask
 from flask_sitemapper import Sitemapper
@@ -36,7 +34,7 @@ app = flask.Flask("test_app")
 sitemapper.init_app(app)
 ```
 
-#### Method 2 example
+#### Alternative Method
 ```python
 import flask
 from flask_sitemapper import Sitemapper
@@ -48,7 +46,7 @@ app = flask.Flask("test_app")
 sitemapper = Sitemapper(app)
 ```
 
-### Adding URLs to the sitemap
+### Adding URLs to the Sitemap
 Decorators are added to route functions to include their URLs in the sitemap. These must be included above the Flask decorators.
 ```python
 # Define the homepage route and include it in the sitemap
@@ -90,7 +88,7 @@ def r_store():
     return "<h1>Store Page</h1>"
 ```
 
-### Using with Flask blueprints
+### Using With Flask blueprints
 * Create your `Sitemapper` instance(s) in a seperate file or otherwise avoiding circular imports.
 
 * Import and use the instance(s) in your blueprints.
@@ -102,7 +100,7 @@ You can also add Flask endpoints to the sitemap by using their endpoint name as 
 sitemapper.add_endpoint("r_contact", lastmod="2022-02-09")
 ```
 
-### Generating and serving the sitemap
+### Generating and Serving the Sitemap
 To serve your sitemap, you must define a route function that returns `sitemapper.generate()`. Your sitemap will then be avaliable at the URL(s) you specify.
 
 This route should be defined after all routes that are included in the sitemap.
@@ -112,8 +110,8 @@ def r_sitemap():
     return sitemapper.generate()
 ```
 
-### Master sitemaps
-Master sitemaps, or sitemap indexes, are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organisational purposes. You can create a master sitemapper by specifying `master=True` when initialising your sitemapper.
+### Sitemap Indexes
+Sitemap indexes are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organisational purposes. You can create a master sitemapper, which generates a sitemap index, by specifying `master=True` when creating the instance.
 
 Note that sitemap indexes have a different syntax to regular sitemaps, so it is important to provide this argument.
 ```python
@@ -150,7 +148,7 @@ For this example, the sitemap index would look like this:
 </sitemapindex>
 ```
 
-### Example app
+### Example App
 ```python
 import flask
 from flask_sitemapper import Sitemapper
@@ -181,3 +179,59 @@ def r_sitemap():
 
 app.run()
 ```
+
+## Development & Contributing
+Thank you for contributing to the project! All issues and pull requests are highly appreciated.
+
+### Development Requirements
+* [Python](https://www.python.org) 3.7 or later
+* [Poetry](https://python-poetry.org) for package management and building
+
+The following Python libraries will be installed automatically to a virtual environment by poetry during setup.
+* flask
+* jinja2
+* black
+* isort
+* pytest
+* requests
+
+### Project Setup
+Install `poetry` if not already installed.
+```terminal
+pip install poetry
+```
+
+Clone the repository and enter the repository's directory.
+```terminal
+git clone https://github.com/h-janes/flask-sitemapper
+cd flask-sitemapper
+```
+
+Create the poetry virtual environment and install dependencies.
+```terminal
+poetry install
+```
+You may want to configure your editor to use the virtual environment for linting and debugging. You can find the path of the virtual environment with the command:
+```terminal
+poetry env info --path
+```
+
+### Code Style
+Flask Sitemapper uses `black` for code formatting and `isort` for import ordering.
+
+It is recommended that you configure your editor to run `black` and `isort` on save, making sure that they access the configurations defined in `pyproject.toml`
+
+Otherwise, you should ensure that your code conforms to these style standards before submitting a pull request.
+
+### Testing
+Tests are stored in the `tests` directory. You should ensure that all tests are passing before creating a pull request. If you create a pull request with new features, creating new tests for your additions is highly appreciated. You can run all tests with the command: 
+```terminal
+poetry run pytest
+```
+
+### Building
+The project can be built with the command:
+```terminal
+poetry build
+```
+This should generate a `dist` directory containing a `.tar.gz` file and a `.whl` file.
