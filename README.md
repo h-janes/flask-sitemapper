@@ -57,7 +57,7 @@ def r_home():
     return flask.render_template("index.html")
 ```
 
-You can pass arguments to the decorator to include additional information in the sitemap. Whatever arguments you provide will be included in the URL entry as-is.
+You can pass arguments to the decorator to include additional information in the sitemap. Valid arguments are `lastmod` `changefreq` and `priority`.
 ```python
 @sitemapper.include(
     lastmod = "2022-02-08",
