@@ -2,7 +2,7 @@
 
 SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {%- for url in urlset %}
+  {%- for url in urls %}
   <url>
     {%- for line in url.xml %}
     {{ line|safe }}
@@ -13,7 +13,7 @@ SITEMAP = """<?xml version="1.0" encoding="utf-8"?>
 
 SITEMAP_INDEX = """<?xml version="1.0" encoding="utf-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {%- for url in urlset %}
+  {%- for url in urls %}
   <sitemap>
     {%- for line in url.xml %}
     {{ line|safe }}
