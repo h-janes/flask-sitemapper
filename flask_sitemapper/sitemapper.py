@@ -33,7 +33,7 @@ class URL:
         return url_for(self.endpoint, _external=True, _scheme=self.scheme)
 
     @property
-    def xml(self) -> str:
+    def xml(self) -> list:
         """Generates a list of XML lines for this URL's sitemap entry"""
         xml_lines = [f"<loc>{self.loc}</loc>"]
         if self.lastmod:
