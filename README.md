@@ -127,6 +127,16 @@ def r_sitemap():
     return sitemapper.generate()
 ```
 
+#### Using GZIP
+You can serve your sitemap with GZIP compression by specifying this when calling the `generate` method. By default, GZIP will not be used.
+```python
+@app.route("/sitemap.xml")
+def r_sitemap():
+    return sitemapper.generate(gzip=True)
+```
+
+The sitemap will only be gzipped if the client accepts GZIP encoding. GZIP will also not be used if the response already has a `Content-Encoding` header, to avoid conflicts with other compression/encoding that you may be using.
+
 ### Sitemap Indexes
 Sitemap indexes are sitemaps that list other sitemaps. These are used if a single sitemap would be too large, or sometimes for organizational purposes. You can create a master sitemapper, which generates a sitemap index, by specifying `master=True` when creating the instance.
 

@@ -48,13 +48,10 @@ class URL:
 class Sitemapper:
     """The main class for this extension which manages and creates a sitemap"""
 
-    def __init__(
-        self, app: Flask = None, https: bool = True, master: bool = False, gzip: bool = False
-    ) -> None:
+    def __init__(self, app: Flask = None, https: bool = True, master: bool = False) -> None:
         # process and store provided arguments
         self.scheme = "https" if https else "http"
         self.template = SITEMAP_INDEX if master else SITEMAP
-        self.gzip = gzip
 
         # list of URL objects to list in the sitemap
         self.urls = []
@@ -136,7 +133,7 @@ class Sitemapper:
         url = URL(endpoint, self.scheme, lastmod=lastmod, changefreq=changefreq, priority=priority)
         self.urls.append(url)
 
-    def generate(self) -> Response:
+    def generate(self, gzip: bool = False) -> Response:
         """Creates a Flask `Response` object for the XML sitemap"""
         # load the jinja template
         template = Environment(loader=BaseLoader).from_string(self.template)
@@ -148,7 +145,7 @@ class Sitemapper:
         response = Response(xml, content_type="application/xml")
 
         # gzip the response if desired
-        if self.gzip:
+        if gzip:
             response = gzip_response(response)
 
         return response

@@ -6,7 +6,7 @@ from flask_sitemapper import Sitemapper
 
 # ----------------- TEST APP -----------------
 
-sitemapper = Sitemapper(gzip=True)
+sitemapper = Sitemapper()
 app = flask.Flask(__name__)
 sitemapper.init_app(app)
 
@@ -30,7 +30,7 @@ def r_admin():
 
 @app.route("/sitemap.xml")
 def r_sitemap():
-    return sitemapper.generate()
+    return sitemapper.generate(gzip=True)
 
 
 # ----------------- END TEST APP -----------------
