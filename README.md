@@ -56,8 +56,23 @@ Decorators are added to route functions to include their URLs in the sitemap. Th
 def r_home():
     return flask.render_template("index.html")
 ```
+#### Additional Arguments
+You can pass optional arguments to the decorator to include additional information in the sitemap. Valid arguments are listed below, as defined by the [sitemap protocol](https://www.sitemaps.org/protocol.html): 
 
-You can pass arguments to the decorator to include additional information in the sitemap. Valid arguments are `lastmod` `changefreq` and `priority`.
+* `lastmod` - The date on which this page was last modified as a string in [W3C datetime](https://www.w3.org/TR/NOTE-datetime) format. (e.g. YYYY-MM-DD)
+
+* `changefreq` - How frequently the page is likely to change. Acceptable values are:
+
+    * always
+    * hourly
+    * daily
+    * weekly
+    * monthly
+    * yearly
+    * never
+
+* `priority` - The priority of this URL relative to other URLs on your site as a string, float, or integer. Valid values range from 0.0 to 1.0
+
 ```python
 @sitemapper.include(
     lastmod = "2022-02-08",
@@ -79,6 +94,7 @@ This example would appear in the sitemap as:
 </url>
 ```
 
+#### Notes
 For routes where multiple URL paths are defined, the sitemap will only include the last path.
 ```python
 @sitemapper.include()
@@ -96,7 +112,7 @@ def r_store():
 
 * Import the instance(s) when creating your flask app and initialize with `sitemapper.init_app(app)` ***after*** registering your blueprints.
 
-You can also add Flask endpoints to the sitemap by using their endpoint name as shown below. Keyword arguments can still be given after the endpoint name.
+You can also add Flask endpoints to the sitemap by using their endpoint name as shown below. Arguments can still be given after the endpoint name.
 ```python
 sitemapper.add_endpoint("r_contact", lastmod="2022-02-09")
 ```

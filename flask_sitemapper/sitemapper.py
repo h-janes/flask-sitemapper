@@ -20,7 +20,6 @@ class URL:
         lastmod: str = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
-        **kwargs,
     ) -> None:
         self.endpoint = endpoint
         self.scheme = scheme
@@ -80,12 +79,14 @@ class Sitemapper:
         # clear the deferred functions list
         self.deferred_functions.clear()
 
-    def include(self, **kwargs) -> Callable:
+    def include(
+        self, lastmod: str = None, changefreq: str = None, priority: Union[str, int, float] = None
+    ) -> Callable:
         """A decorator for view functions to add their URL to the sitemap"""
 
         # decorator that calls add_endpoint
         def decorator(func: Callable) -> Callable:
-            self.add_endpoint(func, **kwargs)
+            self.add_endpoint(func, lastmod=lastmod, changefreq=changefreq, priority=priority)
 
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -108,11 +109,21 @@ class Sitemapper:
             f"{func.__name__} in module {func.__module__} is not a registered view function"
         )
 
-    def add_endpoint(self, view_func: Union[Callable, str], **kwargs) -> None:
+    def add_endpoint(
+        self,
+        view_func: Union[Callable, str],
+        lastmod: str = None,
+        changefreq: str = None,
+        priority: Union[str, int, float] = None,
+    ) -> None:
         """Adds the URL of `view_func` to the sitemap with any provided arguments"""
         # if extension is not yet initialized, register this as a deferred function and return
         if not self.app:
-            self.deferred_functions.append(lambda s: s.add_endpoint(view_func, **kwargs))
+            self.deferred_functions.append(
+                lambda s: s.add_endpoint(
+                    view_func, lastmod=lastmod, changefreq=changefreq, priority=priority
+                )
+            )
             return
 
         # get the endpoint name of view_func
@@ -122,7 +133,7 @@ class Sitemapper:
             endpoint = view_func
 
         # create a URL object and append it to self.urls
-        url = URL(endpoint, self.scheme, **kwargs)
+        url = URL(endpoint, self.scheme, lastmod=lastmod, changefreq=changefreq, priority=priority)
         self.urls.append(url)
 
     def generate(self) -> Response:
