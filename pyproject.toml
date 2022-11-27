@@ -6,6 +6,8 @@ authors = ["h-janes <dev@hjanes.com>"]
 license = "MIT"
 readme = "README.md"
 keywords = ["python3", "flask", "sitemap", "xml"]
+repository = "https://github.com/h-janes/flask-sitemapper"
+documentation = "https://github.com/h-janes/flask-sitemapper/wiki"
 classifiers=[
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
