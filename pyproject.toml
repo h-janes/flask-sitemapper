@@ -1,6 +1,7 @@
 [tool.poetry]
 name = "flask-sitemapper"
-version = "1.5.0"
+# The version will be automatically set when a release is created
+version = "0.0.0"
 description = "Flask extension for generating XML sitemaps"
 authors = ["h-janes <dev@hjanes.com>"]
 license = "MIT"
