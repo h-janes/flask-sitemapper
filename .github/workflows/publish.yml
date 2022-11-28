@@ -22,6 +22,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
+        
+    - name: Set version number
+      run: |
+        poetry version ${{ github.event.release.tag_name }}
 
     - name: Build package
       run: poetry build
