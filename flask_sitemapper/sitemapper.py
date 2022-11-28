@@ -1,5 +1,6 @@
 """Provides the `URL` and `Sitemapper` classes"""
 
+from datetime import datetime
 from functools import wraps
 from typing import Callable, Union
 
@@ -17,7 +18,7 @@ class URL:
         self,
         endpoint,
         scheme: str,
-        lastmod: str = None,
+        lastmod: Union[str, datetime] = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
     ) -> None:
@@ -26,6 +27,9 @@ class URL:
         self.lastmod = lastmod
         self.changefreq = changefreq
         self.priority = priority
+
+        if isinstance(self.lastmod, datetime):
+            self.lastmod = self.lastmod.strftime("%Y-%m-%dT%H:%M:%S")
 
     @property
     def loc(self) -> str:
@@ -77,7 +81,10 @@ class Sitemapper:
         self.deferred_functions.clear()
 
     def include(
-        self, lastmod: str = None, changefreq: str = None, priority: Union[str, int, float] = None
+        self,
+        lastmod: Union[str, datetime] = None,
+        changefreq: str = None,
+        priority: Union[str, int, float] = None,
     ) -> Callable:
         """A decorator for view functions to add their URL to the sitemap"""
 
@@ -109,7 +116,7 @@ class Sitemapper:
     def add_endpoint(
         self,
         view_func: Union[Callable, str],
-        lastmod: str = None,
+        lastmod: Union[str, datetime] = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
     ) -> None:
