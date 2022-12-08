@@ -1,52 +1,15 @@
-"""Provides the `URL` and `Sitemapper` classes"""
+"""Provides the `Sitemapper` class"""
 
 from datetime import datetime
 from functools import wraps
 from typing import Callable, Union
 
-from flask import Flask, Response, url_for
+from flask import Flask, Response
 from jinja2 import BaseLoader, Environment
 
 from .gzip import gzip_response
 from .templates import SITEMAP, SITEMAP_INDEX
-
-
-class URL:
-    """Stores a URL for the sitemap with its arguments"""
-
-    def __init__(
-        self,
-        endpoint,
-        scheme: str,
-        lastmod: Union[str, datetime] = None,
-        changefreq: str = None,
-        priority: Union[str, int, float] = None,
-    ) -> None:
-        self.endpoint = endpoint
-        self.scheme = scheme
-        self.lastmod = lastmod
-        self.changefreq = changefreq
-        self.priority = priority
-
-        if isinstance(self.lastmod, datetime):
-            self.lastmod = self.lastmod.strftime("%Y-%m-%dT%H:%M:%S")
-
-    @property
-    def loc(self) -> str:
-        """Finds the URL from the endpoint name. Must be called within a request context"""
-        return url_for(self.endpoint, _external=True, _scheme=self.scheme)
-
-    @property
-    def xml(self) -> list:
-        """Generates a list of XML lines for this URL's sitemap entry"""
-        xml_lines = [f"<loc>{self.loc}</loc>"]
-        if self.lastmod:
-            xml_lines.append(f"<lastmod>{self.lastmod}</lastmod>")
-        if self.changefreq:
-            xml_lines.append(f"<changefreq>{self.changefreq}</changefreq>")
-        if self.priority:
-            xml_lines.append(f"<priority>{self.priority}</priority>")
-        return xml_lines
+from .url import URL
 
 
 class Sitemapper:
@@ -62,6 +25,9 @@ class Sitemapper:
 
         # list of functions to run after extension initialization
         self.deferred_functions = []
+
+        # store the finished XML for the sitemap
+        self.xml = None
 
         # initialize the extension if the app argument is provided, otherwise, set self.app to None
         self.app = None
@@ -85,12 +51,12 @@ class Sitemapper:
         lastmod: Union[str, datetime] = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
+        url_variables: dict = {},
     ) -> Callable:
         """A decorator for view functions to add their URL to the sitemap"""
-
         # decorator that calls add_endpoint
         def decorator(func: Callable) -> Callable:
-            self.add_endpoint(func, lastmod=lastmod, changefreq=changefreq, priority=priority)
+            self.add_endpoint(func, lastmod, changefreq, priority, url_variables)
 
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -119,14 +85,13 @@ class Sitemapper:
         lastmod: Union[str, datetime] = None,
         changefreq: str = None,
         priority: Union[str, int, float] = None,
+        url_variables: dict = {},
     ) -> None:
         """Adds the URL of `view_func` to the sitemap with any provided arguments"""
         # if extension is not yet initialized, register this as a deferred function and return
         if not self.app:
             self.deferred_functions.append(
-                lambda s: s.add_endpoint(
-                    view_func, lastmod=lastmod, changefreq=changefreq, priority=priority
-                )
+                lambda s: s.add_endpoint(view_func, lastmod, changefreq, priority)
             )
             return
 
@@ -136,20 +101,29 @@ class Sitemapper:
         else:
             endpoint = view_func
 
-        # create a URL object and append it to self.urls
-        url = URL(endpoint, self.scheme, lastmod=lastmod, changefreq=changefreq, priority=priority)
-        self.urls.append(url)
+        # if url variables are provided (for dynamic routes)
+        if url_variables:
+            # create a URL object for each set of url variables and append it to self.urls
+            for i in [dict(zip(url_variables, t)) for t in zip(*url_variables.values())]:
+                url = URL(endpoint, self.scheme, lastmod, changefreq, priority, i)
+                self.urls.append(url)
+        else:
+            # create a URL object without url variables and append it to self.urls
+            url = URL(endpoint, self.scheme, lastmod, changefreq, priority)
+            self.urls.append(url)
 
     def generate(self, gzip: bool = False) -> Response:
         """Creates a Flask `Response` object for the XML sitemap"""
-        # load the jinja template
-        template = Environment(loader=BaseLoader).from_string(self.template)
+        # create and store the sitemap XML if not already stored
+        if not self.xml:
+            # load the jinja template
+            template = Environment(loader=BaseLoader).from_string(self.template)
 
-        # render the template with the URLs and parameters
-        xml = template.render(urls=self.urls)
+            # render the template with the URLs and parameters
+            self.xml = template.render(urls=self.urls)
 
         # create a flask response
-        response = Response(xml, content_type="application/xml")
+        response = Response(self.xml, content_type="application/xml")
 
         # gzip the response if desired
         if gzip:
