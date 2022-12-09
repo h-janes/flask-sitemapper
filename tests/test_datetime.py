@@ -1,58 +1,55 @@
 from datetime import datetime
 
 import flask
+import pytest
 
 from flask_sitemapper import Sitemapper
 
-# ----------------- TEST APP -----------------
 
-sitemapper = Sitemapper()
-app = flask.Flask(__name__)
-sitemapper.init_app(app)
+@pytest.fixture
+def client():
+    sitemapper = Sitemapper()
+    app = flask.Flask(__name__)
+    sitemapper.init_app(app)
 
+    @sitemapper.include(lastmod=datetime(2022, 2, 1))
+    @app.route("/")
+    def r_home():
+        return "<h1>Home</h1>"
 
-@sitemapper.include(lastmod=datetime(2022, 11, 28))
-@app.route("/")
-def r_home():
-    return "<h1>Home</h1>"
+    @app.route("/sitemap.xml")
+    def r_sitemap():
+        return sitemapper.generate()
 
-
-@app.route("/sitemap.xml")
-def r_sitemap():
-    return sitemapper.generate()
-
-
-# ----------------- END TEST APP -----------------
+    return app.test_client()
 
 
-def test_running():
-    with app.test_client() as test_client:
-        response = test_client.get("/")
-        assert response.text == "<h1>Home</h1>"
-
-
-def test_status_code():
-    with app.test_client() as test_client:
-        response = test_client.get("/sitemap.xml")
-        assert response.status_code == 200
-
-
-def test_mimetype():
-    with app.test_client() as test_client:
-        response = test_client.get("/sitemap.xml")
-        assert response.mimetype == "application/xml"
-
-
-def test_xml():
-    with app.test_client() as test_client:
-        response = test_client.get("/sitemap.xml")
-        assert (
-            response.text
-            == """<?xml version="1.0" encoding="utf-8"?>
+@pytest.fixture
+def expected_xml():
+    return """<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://localhost/</loc>
-    <lastmod>2022-11-28T00:00:00</lastmod>
+    <lastmod>2022-02-01T00:00:00</lastmod>
   </url>
 </urlset>"""
-        )
+
+
+def test_running(client):
+    response = client.get("/")
+    assert response.text == "<h1>Home</h1>"
+
+
+def test_status_code(client):
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+
+
+def test_mimetype(client):
+    response = client.get("/sitemap.xml")
+    assert response.mimetype == "application/xml"
+
+
+def test_xml(client, expected_xml):
+    response = client.get("/sitemap.xml")
+    assert response.text == expected_xml

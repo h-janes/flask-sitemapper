@@ -104,7 +104,7 @@ class Sitemapper:
         # if url variables are provided (for dynamic routes)
         if url_variables:
             # create a URL object for each set of url variables and append it to self.urls
-            for i in [dict(zip(url_variables, t)) for t in zip(*url_variables.values())]:
+            for i in [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]:
                 url = URL(endpoint, self.scheme, lastmod, changefreq, priority, i)
                 self.urls.append(url)
         else:

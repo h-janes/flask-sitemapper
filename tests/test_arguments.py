@@ -1,5 +1,3 @@
-import gzip
-
 import flask
 import pytest
 
@@ -12,14 +10,23 @@ def client():
     app = flask.Flask(__name__)
     sitemapper.init_app(app)
 
-    @sitemapper.include()
+    @sitemapper.include(lastmod="2022-02-01", changefreq="monthly", priority=1.0)
     @app.route("/")
     def r_home():
         return "<h1>Home</h1>"
 
+    @sitemapper.include(changefreq="yearly")
+    @app.route("/about")
+    def r_about():
+        return "<h1>About</h1>"
+
+    @app.route("/admin")
+    def r_admin():
+        return "<h1>Admin</h1>"
+
     @app.route("/sitemap.xml")
     def r_sitemap():
-        return sitemapper.generate(gzip=True)
+        return sitemapper.generate()
 
     return app.test_client()
 
@@ -30,36 +37,32 @@ def expected_xml():
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://localhost/</loc>
+    <lastmod>2022-02-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://localhost/about</loc>
+    <changefreq>yearly</changefreq>
   </url>
 </urlset>"""
 
 
 def test_running(client):
-    response = client.get("/", headers={"Accept-Encoding": "gzip"})
+    response = client.get("/")
     assert response.text == "<h1>Home</h1>"
 
 
 def test_status_code(client):
-    response = client.get("/sitemap.xml", headers={"Accept-Encoding": "gzip"})
+    response = client.get("/sitemap.xml")
     assert response.status_code == 200
 
 
-def test_encoding(client):
-    response = client.get("/sitemap.xml", headers={"Accept-Encoding": "gzip"})
-    assert response.headers["Content-Encoding"] == "gzip"
-
-
 def test_mimetype(client):
-    response = client.get("/sitemap.xml", headers={"Accept-Encoding": "gzip"})
+    response = client.get("/sitemap.xml")
     assert response.mimetype == "application/xml"
 
 
 def test_xml(client, expected_xml):
-    response = client.get("/sitemap.xml", headers={"Accept-Encoding": "gzip"})
-    data = str(gzip.decompress(response.data), "utf-8")
-    assert data == expected_xml
-
-
-def test_not_accepting_gzip(client, expected_xml):
     response = client.get("/sitemap.xml")
     assert response.text == expected_xml

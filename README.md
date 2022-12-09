@@ -21,6 +21,7 @@ For documentation (including for contributors), see [the wiki](https://github.co
 * Create multiple sitemaps and sitemap indexes for the same app
 * Supports apps using Flask blueprints
 * Supports apps serving multiple domains
+* Supports dynamic routes
 * Works with many different app structures
 
 # Sitemaps
