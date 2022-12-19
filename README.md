@@ -1,7 +1,4 @@
 # Flask Sitemapper
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/h-janes/flask-sitemapper/Run%20Tests)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/flask-sitemapper?color=%23529AC3)
-
 Flask Sitemapper is a Python 3 package that generates XML sitemaps for Flask applications. This allows you to create fully functional sitemaps and sitemap indexes for your Flask projects with minimal code.
 
 You can install the [latest version](https://pypi.org/project/flask-sitemapper/) of Flask Sitemapper with pip:
