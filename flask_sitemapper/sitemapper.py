@@ -91,7 +91,7 @@ class Sitemapper:
         # if extension is not yet initialized, register this as a deferred function and return
         if not self.app:
             self.deferred_functions.append(
-                lambda s: s.add_endpoint(view_func, lastmod, changefreq, priority)
+                lambda s: s.add_endpoint(view_func, lastmod, changefreq, priority, url_variables)
             )
             return
 
