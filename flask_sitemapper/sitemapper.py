@@ -48,9 +48,9 @@ class Sitemapper:
 
     def include(
         self,
-        lastmod: Union[str, datetime] = None,
-        changefreq: str = None,
-        priority: Union[str, int, float] = None,
+        lastmod: Union[str, datetime, list] = None,
+        changefreq: Union[str, list] = None,
+        priority: Union[str, int, float, list] = None,
         url_variables: dict = {},
     ) -> Callable:
         """A decorator for view functions to add their URL to the sitemap"""
@@ -82,9 +82,9 @@ class Sitemapper:
     def add_endpoint(
         self,
         view_func: Union[Callable, str],
-        lastmod: Union[str, datetime] = None,
-        changefreq: str = None,
-        priority: Union[str, int, float] = None,
+        lastmod: Union[str, datetime, list] = None,
+        changefreq: Union[str, list] = None,
+        priority: Union[str, int, float, list] = None,
         url_variables: dict = {},
     ) -> None:
         """Adds the URL of `view_func` to the sitemap with any provided arguments"""
@@ -104,8 +104,16 @@ class Sitemapper:
         # if url variables are provided (for dynamic routes)
         if url_variables:
             # create a URL object for each set of url variables and append it to self.urls
-            for i in [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]:
-                url = URL(endpoint, self.scheme, lastmod, changefreq, priority, i)
+            for i, v in enumerate(
+                [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]
+            ):
+                # use sitemap args from the list if a list is provided
+                l = lastmod[i] if isinstance(lastmod, list) else lastmod
+                c = changefreq[i] if isinstance(changefreq, list) else changefreq
+                p = priority[i] if isinstance(priority, list) else priority
+
+                # create URL object
+                url = URL(endpoint, self.scheme, l, c, p, v)
                 self.urls.append(url)
         else:
             # create a URL object without url variables and append it to self.urls
