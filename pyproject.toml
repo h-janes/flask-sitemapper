@@ -12,21 +12,20 @@ documentation = "https://github.com/h-janes/flask-sitemapper/wiki"
 classifiers=[
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Framework :: Flask",
     "Operating System :: OS Independent",
 ]
 packages = [{include = "flask_sitemapper"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8"
 flask = ">=2.2.2"
-jinja2 = "^3.1.2"
+jinja2 = ">=3.1.3"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.10.0"
-isort = "^5.10.1"
-pytest = "^7.2.0"
+black = ">=24.3.0"
+isort = ">=5.10.1"
+pytest = ">=7.2.0"
 
 [tool.black]
 line-length = 99
