@@ -1,9 +1,9 @@
 """Provides the `URL` class"""
 
 from datetime import datetime
-from typing import Union
+from typing import Callable, Union
 
-from flask import url_for
+from flask import current_app, url_for
 
 
 class URL:
@@ -44,3 +44,46 @@ class URL:
         if self.priority:
             xml_lines.append(f"<priority>{self.priority}</priority>")
         return xml_lines
+
+
+class DynamicEndpoint:
+    """Manages URLs for endpoints using URL variable generator functions"""
+
+    def __init__(
+        self,
+        endpoint,
+        scheme: str,
+        lastmod: Union[str, datetime, list] = None,
+        changefreq: Union[str, datetime, list] = None,
+        priority: Union[str, int, float, list] = None,
+        url_variables: Union[Callable, dict] = {},
+    ) -> None:
+        self.endpoint = endpoint
+        self.scheme = scheme
+        self.lastmod = lastmod
+        self.changefreq = changefreq
+        self.priority = priority
+        self.url_variables = url_variables
+
+    @property
+    def urls(self) -> list:
+        if isinstance(self.url_variables, Callable):
+            # run generator function if provided
+            with current_app.app_context():
+                url_variables = self.url_variables()
+        else:
+            url_variables = self.url_variables
+
+        urls = []
+
+        for i, v in enumerate([dict(zip(url_variables, j)) for j in zip(*url_variables.values())]):
+            # use sitemap args from the list if a list is provided
+            l = self.lastmod[i] if isinstance(self.lastmod, list) else self.lastmod
+            c = self.changefreq[i] if isinstance(self.changefreq, list) else self.changefreq
+            p = self.priority[i] if isinstance(self.priority, list) else self.priority
+
+            # create URL object
+            url = URL(self.endpoint, self.scheme, l, c, p, v)
+            urls.append(url)
+
+        return urls

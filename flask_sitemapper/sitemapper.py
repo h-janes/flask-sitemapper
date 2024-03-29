@@ -9,13 +9,15 @@ from jinja2 import BaseLoader, Environment
 
 from .gzip import gzip_response
 from .templates import SITEMAP, SITEMAP_INDEX
-from .url import URL
+from .url import URL, DynamicEndpoint
 
 
 class Sitemapper:
     """The main class for this extension which manages and creates a sitemap"""
 
-    def __init__(self, app: Flask = None, https: bool = True, master: bool = False) -> None:
+    def __init__(
+        self, app: Flask = None, https: bool = True, master: bool = False, cache_xml: bool = True
+    ) -> None:
         # process and store provided arguments
         self.scheme = "https" if https else "http"
         self.template = SITEMAP_INDEX if master else SITEMAP
@@ -23,11 +25,15 @@ class Sitemapper:
         # list of URL objects to list in the sitemap
         self.urls = []
 
+        # list of DynamicEndpoint objects for endpoints suing url variables
+        self.dynamic_endpoints = []
+
         # list of functions to run after extension initialization
         self.deferred_functions = []
 
         # store the finished XML for the sitemap
-        self.xml = None
+        self.cache_xml = cache_xml
+        self.cached_xml = None
 
         # initialize the extension if the app argument is provided, otherwise, set self.app to None
         self.app = None
@@ -51,9 +57,10 @@ class Sitemapper:
         lastmod: Union[str, datetime, list] = None,
         changefreq: Union[str, list] = None,
         priority: Union[str, int, float, list] = None,
-        url_variables: dict = {},
+        url_variables: Union[Callable, dict] = {},
     ) -> Callable:
         """A decorator for view functions to add their URL to the sitemap"""
+
         # decorator that calls add_endpoint
         def decorator(func: Callable) -> Callable:
             self.add_endpoint(func, lastmod, changefreq, priority, url_variables)
@@ -85,7 +92,7 @@ class Sitemapper:
         lastmod: Union[str, datetime, list] = None,
         changefreq: Union[str, list] = None,
         priority: Union[str, int, float, list] = None,
-        url_variables: dict = {},
+        url_variables: Union[Callable, dict] = {},
     ) -> None:
         """Adds the URL of `view_func` to the sitemap with any provided arguments"""
         # if extension is not yet initialized, register this as a deferred function and return
@@ -103,18 +110,11 @@ class Sitemapper:
 
         # if url variables are provided (for dynamic routes)
         if url_variables:
-            # create a URL object for each set of url variables and append it to self.urls
-            for i, v in enumerate(
-                [dict(zip(url_variables, j)) for j in zip(*url_variables.values())]
-            ):
-                # use sitemap args from the list if a list is provided
-                l = lastmod[i] if isinstance(lastmod, list) else lastmod
-                c = changefreq[i] if isinstance(changefreq, list) else changefreq
-                p = priority[i] if isinstance(priority, list) else priority
-
-                # create URL object
-                url = URL(endpoint, self.scheme, l, c, p, v)
-                self.urls.append(url)
+            # create a DynamicEndpoint object
+            dynamic_endpoint = DynamicEndpoint(
+                endpoint, self.scheme, lastmod, changefreq, priority, url_variables
+            )
+            self.dynamic_endpoints.append(dynamic_endpoint)
         else:
             # create a URL object without url variables and append it to self.urls
             url = URL(endpoint, self.scheme, lastmod, changefreq, priority)
@@ -122,16 +122,26 @@ class Sitemapper:
 
     def generate(self, gzip: bool = False) -> Response:
         """Creates a Flask `Response` object for the XML sitemap"""
-        # create and store the sitemap XML if not already stored
-        if not self.xml:
-            # load the jinja template
-            template = Environment(loader=BaseLoader).from_string(self.template)
 
-            # render the template with the URLs and parameters
-            self.xml = template.render(urls=self.urls)
+        # check for cached xml
+        if self.cached_xml:
+            xml = self.cached_xml
+        else:
+            # get all urls for the sitemap
+            urls = self.urls
+            for dynamic_endpoint in self.dynamic_endpoints:
+                urls += dynamic_endpoint.urls
+
+            # create the final xml document
+            template = Environment(loader=BaseLoader).from_string(self.template)
+            xml = template.render(urls=urls)
+
+            # cache the xml if enabled
+            if self.cache_xml:
+                self.xml = xml
 
         # create a flask response
-        response = Response(self.xml, content_type="application/xml")
+        response = Response(xml, content_type="application/xml")
 
         # gzip the response if desired
         if gzip:
