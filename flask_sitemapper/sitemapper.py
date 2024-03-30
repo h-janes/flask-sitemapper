@@ -128,7 +128,7 @@ class Sitemapper:
             xml = self.cached_xml
         else:
             # get all urls for the sitemap
-            urls = self.urls
+            urls = self.urls.copy()
             for dynamic_endpoint in self.dynamic_endpoints:
                 urls += dynamic_endpoint.urls
 

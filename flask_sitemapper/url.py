@@ -25,6 +25,7 @@ class URL:
         self.priority = priority
         self.url_variables = url_variables
 
+        # convert datetime lastmod to str
         if isinstance(self.lastmod, datetime):
             self.lastmod = self.lastmod.strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -47,7 +48,7 @@ class URL:
 
 
 class DynamicEndpoint:
-    """Manages URLs for endpoints using URL variable generator functions"""
+    """Manages URLs for endpoints using URL variables / dynamic routes"""
 
     def __init__(
         self,
@@ -68,21 +69,24 @@ class DynamicEndpoint:
     @property
     def urls(self) -> list:
         if isinstance(self.url_variables, Callable):
-            # run generator function if provided
+            # run generator function within app context to get dict
             with current_app.app_context():
                 url_variables = self.url_variables()
         else:
+            # if not a callable, should be a dict already
             url_variables = self.url_variables
 
+        # list to store URL objects
         urls = []
 
+        # iterate over each set of url variables with a line of code only god understands
         for i, v in enumerate([dict(zip(url_variables, j)) for j in zip(*url_variables.values())]):
             # use sitemap args from the list if a list is provided
             l = self.lastmod[i] if isinstance(self.lastmod, list) else self.lastmod
             c = self.changefreq[i] if isinstance(self.changefreq, list) else self.changefreq
             p = self.priority[i] if isinstance(self.priority, list) else self.priority
 
-            # create URL object
+            # create URL object and append to the list
             url = URL(self.endpoint, self.scheme, l, c, p, v)
             urls.append(url)
 
