@@ -7,6 +7,7 @@ from typing import Callable, Union
 from flask import Flask, Response
 from jinja2 import BaseLoader, Environment
 
+from .errors import check_url_variables
 from .gzip import gzip_response
 from .templates import SITEMAP, SITEMAP_INDEX
 from .url import URL, DynamicEndpoint
@@ -15,9 +16,7 @@ from .url import URL, DynamicEndpoint
 class Sitemapper:
     """The main class for this extension which manages and creates a sitemap"""
 
-    def __init__(
-        self, app: Flask = None, https: bool = True, master: bool = False, cache_xml: bool = True
-    ) -> None:
+    def __init__(self, app: Flask = None, https: bool = True, master: bool = False) -> None:
         # process and store provided arguments
         self.scheme = "https" if https else "http"
         self.template = SITEMAP_INDEX if master else SITEMAP
@@ -32,7 +31,7 @@ class Sitemapper:
         self.deferred_functions = []
 
         # store the finished XML for the sitemap
-        self.cache_xml = cache_xml
+        self.cache_xml = True
         self.cached_xml = None
 
         # initialize the extension if the app argument is provided, otherwise, set self.app to None
@@ -110,6 +109,10 @@ class Sitemapper:
 
         # if url variables are provided (for dynamic routes)
         if url_variables:
+            # disable xml caching if a callable value is provided
+            if isinstance(url_variables, Callable):
+                self.cache_xml = False
+
             # create a DynamicEndpoint object
             dynamic_endpoint = DynamicEndpoint(
                 endpoint, self.scheme, lastmod, changefreq, priority, url_variables
@@ -124,7 +127,7 @@ class Sitemapper:
         """Creates a Flask `Response` object for the XML sitemap"""
 
         # check for cached xml
-        if self.cached_xml:
+        if self.cache_xml and self.cached_xml:
             xml = self.cached_xml
         else:
             # get all urls for the sitemap
