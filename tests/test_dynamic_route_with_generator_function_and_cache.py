@@ -68,8 +68,3 @@ def test_mimetype(client):
 def test_xml(client, expected_xml):
     response = client.get("/sitemap.xml")
     assert response.text == expected_xml
-
-
-def test_xml_again(client, expected_xml):
-    response = client.get("/sitemap.xml")
-    assert response.text == expected_xml

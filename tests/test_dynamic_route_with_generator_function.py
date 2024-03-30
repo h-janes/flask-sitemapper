@@ -81,4 +81,5 @@ def test_mimetype(client):
 def test_xml(client, expected_xml):
     response = client.get("/sitemap.xml")
     response2 = client.get("/sitemap.xml")
+    assert response.text == expected_xml.replace("@", __name__)
     assert response2.text == expected_xml.replace("@", __name__)
