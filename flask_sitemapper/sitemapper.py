@@ -7,7 +7,6 @@ from typing import Callable, Union
 from flask import Flask, Response
 from jinja2 import BaseLoader, Environment
 
-from .errors import check_url_variables
 from .gzip import gzip_response
 from .templates import SITEMAP, SITEMAP_INDEX
 from .url import URL, DynamicEndpoint
