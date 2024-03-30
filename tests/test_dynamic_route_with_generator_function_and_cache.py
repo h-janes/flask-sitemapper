@@ -72,5 +72,4 @@ def test_xml(client, expected_xml):
 
 def test_xml_again(client, expected_xml):
     response = client.get("/sitemap.xml")
-    response2 = client.get("/sitemap.xml")
-    assert response2.text == expected_xml
+    assert response.text == expected_xml
