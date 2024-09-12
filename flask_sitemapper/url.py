@@ -54,7 +54,7 @@ class DynamicEndpoint:
         self,
         endpoint,
         scheme: str,
-        lastmod: Union[str, datetime, list] = None,
+        lastmod: Union[Callable, str, datetime, list] = None,
         changefreq: Union[str, datetime, list] = None,
         priority: Union[str, int, float, list] = None,
         url_variables: Union[Callable, dict] = {},
@@ -76,13 +76,20 @@ class DynamicEndpoint:
             # if not a callable, should be a dict already
             url_variables = self.url_variables
 
+        # do the same for dynamic lastmod if provided
+        if isinstance(self.lastmod, Callable):
+            with current_app.app_context():
+                lastmod = self.lastmod()
+        else:
+            lastmod = self.lastmod
+
         # list to store URL objects
         urls = []
 
         # iterate over each set of url variables with a line of code only god understands
         for i, v in enumerate([dict(zip(url_variables, j)) for j in zip(*url_variables.values())]):
             # use sitemap args from the list if a list is provided
-            l = self.lastmod[i] if isinstance(self.lastmod, list) else self.lastmod
+            l = lastmod[i] if isinstance(lastmod, list) else lastmod
             c = self.changefreq[i] if isinstance(self.changefreq, list) else self.changefreq
             p = self.priority[i] if isinstance(self.priority, list) else self.priority
 

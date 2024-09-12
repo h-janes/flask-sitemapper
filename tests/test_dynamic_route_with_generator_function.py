@@ -1,7 +1,11 @@
+from datetime import datetime
+
 import flask
 import pytest
 
 from flask_sitemapper import Sitemapper
+
+NOW = datetime.now()
 
 
 def generate_user_ids():
@@ -11,6 +15,11 @@ def generate_user_ids():
 def generate_app_name():
     with flask.current_app.app_context():
         return {"app_name": [flask.current_app.import_name]}
+
+
+def geenrate_lastmod():
+    with flask.current_app.app_context():
+        return [NOW]
 
 
 @pytest.fixture
@@ -29,7 +38,7 @@ def client():
     def r_user(user_id):
         return f"<h1>User #{user_id}</h1>"
 
-    @sitemapper.include(url_variables=generate_app_name)
+    @sitemapper.include(lastmod=geenrate_lastmod, url_variables=generate_app_name)
     @app.route("/appname/<app_name>")
     def r_app_name(app_name):
         return f"<h1>App name: #{app_name}</h1>"
@@ -43,7 +52,7 @@ def client():
 
 @pytest.fixture
 def expected_xml():
-    return """<?xml version="1.0" encoding="utf-8"?>
+    return f"""<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://localhost/</loc>
@@ -59,6 +68,7 @@ def expected_xml():
   </url>
   <url>
     <loc>https://localhost/appname/@</loc>
+    <lastmod>{NOW.strftime("%Y-%m-%dT%H:%M:%S")}</lastmod>
   </url>
 </urlset>"""
 

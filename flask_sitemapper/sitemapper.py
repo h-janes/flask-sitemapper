@@ -52,7 +52,7 @@ class Sitemapper:
 
     def include(
         self,
-        lastmod: Union[str, datetime, list] = None,
+        lastmod: Union[Callable, str, datetime, list] = None,
         changefreq: Union[str, list] = None,
         priority: Union[str, int, float, list] = None,
         url_variables: Union[Callable, dict] = {},
@@ -87,7 +87,7 @@ class Sitemapper:
     def add_endpoint(
         self,
         view_func: Union[Callable, str],
-        lastmod: Union[str, datetime, list] = None,
+        lastmod: Union[Callable, str, datetime, list] = None,
         changefreq: Union[str, list] = None,
         priority: Union[str, int, float, list] = None,
         url_variables: Union[Callable, dict] = {},
