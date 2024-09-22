@@ -5,6 +5,7 @@ from typing import Callable, Union
 
 from flask import current_app, url_for
 
+from urllib.parse import quote
 
 class URL:
     """Manages a single URL for the sitemap and its arguments"""
@@ -32,7 +33,7 @@ class URL:
     @property
     def loc(self) -> str:
         """Finds the URL from the endpoint name. Must be called within a request context"""
-        return url_for(self.endpoint, _external=True, _scheme=self.scheme, **self.url_variables)
+        return quote(url_for(self.endpoint, _external=True, _scheme=self.scheme, **self.url_variables))
 
     @property
     def xml(self) -> list:
