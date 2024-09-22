@@ -33,7 +33,7 @@ class URL:
     @property
     def loc(self) -> str:
         """Finds the URL from the endpoint name. Must be called within a request context"""
-        return quote(url_for(self.endpoint, _external=True, _scheme=self.scheme, **self.url_variables))
+        return quote(url_for(self.endpoint, _external=True, _scheme=self.scheme, **self.url_variables), safe="/:")
 
     @property
     def xml(self) -> list:
