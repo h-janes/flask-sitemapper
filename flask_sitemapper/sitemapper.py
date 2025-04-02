@@ -23,7 +23,7 @@ class Sitemapper:
         # list of URL objects to list in the sitemap
         self.urls = []
 
-        # list of DynamicEndpoint objects for endpoints suing url variables
+        # list of DynamicEndpoint objects for endpoints using url variables
         self.dynamic_endpoints = []
 
         # list of functions to run after extension initialization
