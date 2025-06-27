@@ -77,6 +77,7 @@ class Sitemapper:
         """Finds the endpoint name of a view function"""
         # loop over all view functions, comparing function ids to find the endpoint name
         for endpoint, view_func in self.app.view_functions.items():
+            # unwraps to compare original functions - this avoids issues with monitoring tools
             if unwrap(func) is unwrap(view_func):
                 return endpoint
 
