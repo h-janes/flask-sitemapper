@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from functools import wraps
+from inspect import unwrap
 from typing import Callable, Union
 
 from flask import Flask, Response
@@ -76,7 +77,7 @@ class Sitemapper:
         """Finds the endpoint name of a view function"""
         # loop over all view functions, comparing function ids to find the endpoint name
         for endpoint, view_func in self.app.view_functions.items():
-            if func is view_func:
+            if unwrap(func) is unwrap(view_func):
                 return endpoint
 
         # raise error if func is not registered as a view function
